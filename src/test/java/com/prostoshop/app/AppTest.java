@@ -13,6 +13,7 @@
 package com.prostoshop.app;
 
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.openqa.selenium.By;
@@ -36,7 +37,7 @@ public class AppTest {
     public void setup() {
         Properties configur = new Properties();
         try {
-            configur.load(new FileInputStream("C:\\Users\\iyefr\\Lesson9_2\\src\\conf.properties"));
+            configur.load(new FileInputStream("G:\\QA Auto Courses\\Lesson9_2\\src\\conf.properties"));
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
@@ -89,19 +90,13 @@ public class AppTest {
 
         // create array with correct values for all controlled digits and compare them with values from the site
         double[] totalArr = {54, 54, 2, 56, 0, 56};
-        if (totalCompare(goodsTotal, productsTotal, shippingTotal, allGoodsTotal, tax, sum, totalArr)) {
-            System.out.println("All the total values are correct");
-        } else {
-            System.out.println("The total values are not correct");
-        }
+        Assert.assertTrue("The total values are not correct", totalCompare(goodsTotal, productsTotal, shippingTotal, allGoodsTotal, tax, sum, totalArr));
 
         // Deleting the goods from the cart
         deleteGoodsFromCart(driver);
 
         //Verify the cart is empty
-        if (isCartEmpty(driver)) {
-            System.out.println("The cart is empty");
-        } else System.out.println("The cart is not empty");
+        Assert.assertTrue("The cart is not empty", isCartEmpty(driver));
     }
 
     @After
@@ -112,80 +107,56 @@ public class AppTest {
     public void runSearching(WebDriver driver) {
 
         // find Search field and enter "Blouse"
-        try {
-            WebElement searchFiled = driver.findElement(By.xpath("//input[@id='search_query_top']"));
-            searchFiled.clear();
-            searchFiled.sendKeys("Blouse");
-        } catch (NoSuchElementException e) {
-            System.out.println(e.getMessage());
-        }
+        WebElement searchFiled = driver.findElement(By.xpath("//input[@id='search_query_top']"));
+        searchFiled.clear();
+        searchFiled.sendKeys("Blouse");
     }
 
     // find and press search button
     public void pressSearchButton(WebDriver driver) {
-        try {
-            WebElement searchButton = driver.findElement(By.xpath("//button[@name='submit_search']"));
-            searchButton.click();
-        } catch (NoSuchElementException e) {
-            System.out.println(e.getMessage());
-        }
+        WebElement searchButton = driver.findElement(By.xpath("//button[@name='submit_search']"));
+        searchButton.click();
     }
 
     public void switchToListView(WebDriver driver) {
         //wait for list button
-        try {
-            new WebDriverWait(driver, 10).until(ExpectedConditions.presenceOfElementLocated(By.xpath("//*[@id=\"list\"]/a/i")));
-        } catch (NoSuchElementException e) {
-            System.out.println(e.getMessage());
-        }
+        new WebDriverWait(driver, 10).until(ExpectedConditions.presenceOfElementLocated(By.xpath("//*[@id=\"list\"]/a/i")));
 
         // find button to switch the list
-        try {
-            WebElement listViewButton = driver.findElement(By.xpath("//*[@id=\"list\"]/a/i"));
-            listViewButton.click();
-        } catch (NoSuchElementException e) {
-            System.out.println(e.getMessage());
-        }
+        WebElement listViewButton = driver.findElement(By.xpath("//*[@id=\"list\"]/a/i"));
+        listViewButton.click();
     }
 
     public void addGoodsToCart(WebDriver driver) {
 
         // add goods to the cart
-        try {
-            WebElement addButton = driver.findElement(By.xpath("//a[@class='button ajax_add_to_cart_button btn btn-default']"));
-            addButton.click();
-        } catch (NoSuchElementException e) {
-            System.out.println(e.getMessage());
-        }
+        WebElement addButton = driver.findElement(By.xpath("//a[@class='button ajax_add_to_cart_button btn btn-default']"));
+        addButton.click();
 
         //close modal window
-        try {
-            WebElement closeButt = driver.findElement(By.xpath("//span[@title='Close window']"));
-            closeButt.click();
-        } catch (NoSuchElementException e) {
-            System.out.println(e.getMessage());
-        }
+        WebElement closeButt = driver.findElement(By.xpath("//span[@title='Close window']"));
+        closeButt.click();
     }
 
     // go to Summary page
     public void moveToSummaryPage(WebDriver driver) {
         try {
-            WebElement cartButton = driver.findElement(By.xpath("//a[@title='View my shopping cart']"));
-            cartButton.click();
-        } catch (NoSuchElementException e) {
-            System.out.println(e.getMessage());
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
+
+        new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(By.xpath("//a[@title='View my shopping cart']")));
+        WebElement cartButton = driver.findElement(By.xpath("//a[@title='View my shopping cart']"));
+        cartButton.click();
     }
 
     // increase goods quantity
     public void increaseGoodsQuantity(WebDriver driver) {
 
-        try {
-            WebElement increaseButton = driver.findElement(By.xpath("//a[@id='cart_quantity_up_2_7_0_0']"));
-            increaseButton.click();
-        } catch (NoSuchElementException e) {
-            System.out.println(e.getMessage());
-        }
+
+        WebElement increaseButton = driver.findElement(By.xpath("//a[@id='cart_quantity_up_2_7_0_0']"));
+        increaseButton.click();
         //Waiting for the table recalculating
         try {
             Thread.sleep(2000);
@@ -196,14 +167,11 @@ public class AppTest {
 
     public double getTotal(WebDriver driver, String xPath) {
         double res = 0;
-        try {
-            WebElement total = driver.findElement(By.xpath(xPath));
-            String strTotal = total.getText();
-            strTotal = strTotal.substring(1, strTotal.length());
-            res = Double.parseDouble(strTotal);
-        } catch (NoSuchElementException e) {
-            System.out.println(e.getMessage());
-        }
+
+        WebElement total = driver.findElement(By.xpath(xPath));
+        String strTotal = total.getText();
+        strTotal = strTotal.substring(1, strTotal.length());
+        res = Double.parseDouble(strTotal);
         return res;
     }
 
@@ -257,16 +225,12 @@ public class AppTest {
     }
 
     public void deleteGoodsFromCart(WebDriver driver) {
-        try {
-            WebElement deleteButton = driver.findElement(By.xpath("//i[@class='icon-trash']"));
-            deleteButton.click();
-        } catch (NoSuchElementException e) {
-            System.out.println(e.getMessage());
-        }
+        WebElement deleteButton = driver.findElement(By.xpath("//i[@class='icon-trash']"));
+        deleteButton.click();
     }
 
     public boolean isCartEmpty(WebDriver driver) {
-        // wait while cart wikk be cleared
+        // wait while cart will be cleared
         try {
             Thread.sleep(2000);
         } catch (InterruptedException e) {
