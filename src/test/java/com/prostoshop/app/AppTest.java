@@ -22,10 +22,8 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.NoSuchElementException;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
@@ -49,7 +47,7 @@ public class AppTest {
     }
 
     @Test
-    public void canCheckTotalPriceForTShirt() {
+    public void ourTest() {
 
         // search for Blouse
         runSearching(driver);
@@ -72,25 +70,27 @@ public class AppTest {
 
         // Get Total product price
         double goodsTotal = getTotal(driver, "//span[@id='total_product_price_2_7_0']");
+        Assert.assertEquals("The total values for GoodsTotal is not correct", 54, goodsTotal, 0);
 
         // Get Total product
         double productsTotal = getTotal(driver, "//td[@id='total_product']");
+        Assert.assertEquals("The total values for ProductTotal is not correct", 54, productsTotal, 0);
 
         // Get Total shipping
         double shippingTotal = getTotal(driver, "//td[@id='total_shipping']");
+        Assert.assertEquals("The total values for ShippingTotal is not correct", 2, shippingTotal, 0);
 
         // Get Total without tax
         double allGoodsTotal = getTotal(driver, "//td[@id='total_price_without_tax']");
+        Assert.assertEquals("The total values for allGoodsTotal is not correct", 56, allGoodsTotal, 0);
 
         // Get Total tax
         double tax = getTotal(driver, "//td[@id='total_tax']");
+        Assert.assertEquals("The total values for Tax is not correct", 0, tax, 0);
 
         // Get Total price
         double sum = getTotal(driver, "//span[@id='total_price']");
-
-        // create array with correct values for all controlled digits and compare them with values from the site
-        double[] totalArr = {54, 54, 2, 56, 0, 56};
-        Assert.assertTrue("The total values are not correct", totalCompare(goodsTotal, productsTotal, shippingTotal, allGoodsTotal, tax, sum, totalArr));
+        Assert.assertEquals("The total values for sum is not correct", 56, sum, 0);
 
         // Deleting the goods from the cart
         deleteGoodsFromCart(driver);
@@ -101,12 +101,14 @@ public class AppTest {
 
     @After
     public void cleanup() {
+        driver.manage().deleteAllCookies();
         driver.close();
     }
 
     public void runSearching(WebDriver driver) {
 
         // find Search field and enter "Blouse"
+        new WebDriverWait(driver, 10).until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@id='search_query_top']")));
         WebElement searchFiled = driver.findElement(By.xpath("//input[@id='search_query_top']"));
         searchFiled.clear();
         searchFiled.sendKeys("Blouse");
@@ -114,6 +116,7 @@ public class AppTest {
 
     // find and press search button
     public void pressSearchButton(WebDriver driver) {
+        new WebDriverWait(driver, 10).until(ExpectedConditions.presenceOfElementLocated(By.xpath("//button[@name='submit_search']")));
         WebElement searchButton = driver.findElement(By.xpath("//button[@name='submit_search']"));
         searchButton.click();
     }
@@ -130,6 +133,7 @@ public class AppTest {
     public void addGoodsToCart(WebDriver driver) {
 
         // add goods to the cart
+        new WebDriverWait(driver, 10).until(ExpectedConditions.presenceOfElementLocated(By.xpath("//a[@class='button ajax_add_to_cart_button btn btn-default']")));
         WebElement addButton = driver.findElement(By.xpath("//a[@class='button ajax_add_to_cart_button btn btn-default']"));
         addButton.click();
 
@@ -154,7 +158,7 @@ public class AppTest {
     // increase goods quantity
     public void increaseGoodsQuantity(WebDriver driver) {
 
-
+        new WebDriverWait(driver, 10).until(ExpectedConditions.presenceOfElementLocated(By.xpath("//a[@id='cart_quantity_up_2_7_0_0']")));
         WebElement increaseButton = driver.findElement(By.xpath("//a[@id='cart_quantity_up_2_7_0_0']"));
         increaseButton.click();
         //Waiting for the table recalculating
@@ -167,7 +171,6 @@ public class AppTest {
 
     public double getTotal(WebDriver driver, String xPath) {
         double res = 0;
-
         WebElement total = driver.findElement(By.xpath(xPath));
         String strTotal = total.getText();
         strTotal = strTotal.substring(1, strTotal.length());
@@ -175,56 +178,9 @@ public class AppTest {
         return res;
     }
 
-    // compare value with predefined
-    public boolean totalCompare(double goodsTotal, double productsTotal, double shippingTotal, double allGoodsTotal,
-                                double tax, double sum, double[] totalArr) {
-        boolean flag1 = false;
-        boolean flag2 = false;
-        boolean flag3 = false;
-        boolean flag4 = false;
-        boolean flag5 = false;
-        boolean flag6 = false;
-
-        for (int i = 0; i < totalArr.length; i++) {
-            switch (i) {
-                case 0:
-                    if (totalArr[i] == goodsTotal) {
-                        flag1 = true;
-                    } else System.out.println("goodsTotal wrong");
-                    break;
-                case 1:
-                    if (totalArr[i] == productsTotal) {
-                        flag2 = true;
-                    } else System.out.println("productsTotal wrong");
-                    break;
-                case 2:
-                    if (totalArr[i] == shippingTotal) {
-                        flag3 = true;
-                    } else System.out.println("shippingTotal wrong");
-                    break;
-                case 3:
-                    if (totalArr[i] == allGoodsTotal) {
-                        flag4 = true;
-                    } else System.out.println("allGoodsTotal wrong");
-                    break;
-                case 4:
-                    if (totalArr[i] == tax) {
-                        flag5 = true;
-                    } else System.out.println("tax wrong");
-                    break;
-                case 5:
-                    if (totalArr[i] == sum) {
-                        flag6 = true;
-                    } else System.out.println("sum wrong");
-                    break;
-            }
-        }
-        if (flag1 && flag2 && flag3 && flag4 && flag5 && flag6) {
-            return true;
-        } else return false;
-    }
-
     public void deleteGoodsFromCart(WebDriver driver) {
+
+        new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(By.xpath("//i[@class='icon-trash']")));
         WebElement deleteButton = driver.findElement(By.xpath("//i[@class='icon-trash']"));
         deleteButton.click();
     }
